@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHSAT Intro Class — ivy tutors network</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #1B3878;
+    --blue:   #0039BA;
+    --cyan:   #29ABE2;
+    --purple: #6B3FA0;
+    --green:  #2FAF04;
+    --lime:   #B2D820;
+    --amber:  #E8A020;
+    --red:    #E63946;
+    --white:  #ffffff;
+    --ink:    #111111;
+    --muted:  #555e7a;
+    --rule:   #dde3f0;
+    --bg:     #f6f8ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 0 60px;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .site-header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+
+  .site-header img {
+    height: 62px; width: 62px;
+    border-radius: 14px;
+    background: #fff;
+    padding: 5px;
+    flex-shrink: 0;
+    position: relative; z-index: 1;
+  }
+
+  .header-text { flex: 1; position: relative; z-index: 1; }
+
+  .header-text h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.3px;
+  }
+
+  .header-text .brand {
+    color: var(--lime);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 5px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: 'DM Sans', sans-serif;
+    position: relative; z-index: 1;
+  }
+
+  .header-meta .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 3px 12px;
+    color: rgba(255,255,255,0.85);
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .header-meta .location {
+    color: var(--lime);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content { padding: 30px 40px 0; }
+
+  /* ── PROPS BOX ── */
+  .props-box {
+    border: 2px solid var(--navy);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 20px;
+  }
+
+  .props-icon {
+    font-size: 28px;
+    padding-top: 2px;
+  }
+
+  .props-inner { }
+
+  .props-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .props-row {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+
+  .props-row:last-child { margin-bottom: 0; }
+
+  .props-row strong {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* ── TIMELINE STRIP ── */
+  .timeline {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+
+  .tl-item {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    background: #fff;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .tl-item:last-child { border-right: none; }
+
+  .tl-item.tech { background: #f0f0f4; }
+
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin: 0 auto 5px;
+    background: var(--navy);
+  }
+
+  .tl-item.seg-2 .tl-dot { background: var(--purple); }
+  .tl-item.seg-3 .tl-dot { background: var(--cyan); }
+  .tl-item.seg-4 .tl-dot { background: var(--green); }
+  .tl-item.tech  .tl-dot { background: #aaa; }
+
+  .tl-seg {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #aaa;
+    margin-bottom: 2px;
+  }
+
+  .tl-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .tl-time {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy);
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 1px 7px;
+    display: inline-block;
+  }
+
+  .tl-item.seg-2 .tl-time { color: var(--purple); }
+  .tl-item.seg-3 .tl-time { color: var(--cyan); }
+  .tl-item.seg-4 .tl-time { color: var(--green); }
+
+  /* ── SEGMENT ── */
+  .segment {
+    margin-bottom: 28px;
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+
+  .seg-head {
+    padding: 14px 22px 12px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(to right, rgba(27,56,120,0.04), transparent);
+  }
+
+  .segment.seg-2 .seg-head { background: linear-gradient(to right, rgba(107,63,160,0.06), transparent); }
+  .segment.seg-3 .seg-head { background: linear-gradient(to right, rgba(41,171,226,0.06), transparent); }
+  .segment.seg-4 .seg-head { background: linear-gradient(to right, rgba(47,175,4,0.06), transparent); }
+  .segment.tech  .seg-head { background: #f5f5f8; }
+  .segment.hw    .seg-head { background: linear-gradient(to right, rgba(232,160,32,0.06), transparent); }
+
+  .seg-accent {
+    width: 4px;
+    height: 36px;
+    border-radius: 3px;
+    background: var(--navy);
+    flex-shrink: 0;
+  }
+
+  .segment.seg-2 .seg-accent { background: var(--purple); }
+  .segment.seg-3 .seg-accent { background: var(--cyan); }
+  .segment.seg-4 .seg-accent { background: var(--green); }
+  .segment.tech  .seg-accent { background: #bbb; }
+  .segment.hw    .seg-accent { background: var(--amber); }
+
+  .seg-head-text { flex: 1; }
+
+  .seg-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+
+  .segment.seg-2 .seg-tag { color: var(--purple); }
+  .segment.seg-3 .seg-tag { color: var(--cyan); }
+  .segment.seg-4 .seg-tag { color: var(--green); }
+  .segment.tech  .seg-tag { color: #999; }
+  .segment.hw    .seg-tag { color: var(--amber); }
+
+  .seg-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .seg-pill {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: var(--navy);
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .segment.seg-2 .seg-pill { background: var(--purple); }
+  .segment.seg-3 .seg-pill { background: var(--cyan); }
+  .segment.seg-4 .seg-pill { background: var(--green); }
+  .segment.tech  .seg-pill { background: #bbb; }
+  .segment.hw    .seg-pill { background: var(--amber); }
+
+  .seg-body { padding: 18px 22px; }
+
+  .seg-body p {
+    margin-bottom: 10px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  .seg-body p:last-child { margin-bottom: 0; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: #fffbe6;
+    border-left: 3px solid #e8c100;
+    border-radius: 0 6px 6px 0;
+    padding: 8px 14px;
+    margin: 10px 0;
+    font-size: 13.5px;
+    font-style: italic;
+    color: #5a4a00;
+  }
+
+  /* ── LINK CARD ── */
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .link-card:hover { border-color: var(--blue); text-decoration: none; }
+
+  .link-card .lc-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .link-card .lc-body { flex: 1; min-width: 0; }
+
+  .link-card .lc-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .link-card .lc-url {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--blue);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-card .lc-arrow {
+    font-size: 16px;
+    color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  /* ── TOPIC CHIPS ── */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 10px 0;
+  }
+
+  .chip {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    padding: 3px 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* ── HW ITEMS ── */
+  .hw-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .hw-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 9px;
+    padding: 11px 14px;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .hw-item:hover { border-color: var(--amber); text-decoration: none; }
+
+  .hw-num {
+    background: var(--amber);
+    color: #fff;
+    border-radius: 50%;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .hw-body { flex: 1; }
+
+  .hw-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .hw-meta {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .hw-url {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    color: var(--blue);
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  .site-footer .brand {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--lime);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .site-footer .copy {
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <img src="data:image/png;base64,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" alt="ivy tutors network">
+    <div class="header-text">
+      <h1>SHSAT Intro Class</h1>
+      <div class="brand">ivy tutors network &nbsp;·&nbsp; Lesson Plan</div>
+    </div>
+    <div class="header-meta">
+      <div class="badge">1 hr 40 min &nbsp;·&nbsp; Teaching: 90 min</div>
+      <span class="location">&#128205; Queens, New York</span>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── PROPS ── -->
+    <div class="props-box">
+      <div class="props-icon">&#127873;</div>
+      <div class="props-inner">
+        <div class="props-title">Props Needed</div>
+        <div class="props-row"><strong>Students:</strong> Every student should bring a notebook to every class.</div>
+        <div class="props-row"><strong>Teacher:</strong> Bring a ball or a crumpled piece of newspaper for the exit ticket toss. Also bring a prize for the student who best recalls 5BLX Block 1 — a water bottle or ivy tutors network branded swag.</div>
+      </div>
+    </div>
+
+    <!-- ── TIMELINE ── -->
+    <div class="timeline">
+      <div class="tl-item tech">
+        <div class="tl-dot"></div>
+        <div class="tl-seg">Tech</div>
+        <div class="tl-label">Setup &amp; Attendance</div>
+        <div class="tl-time">10 min</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-seg">Seg 1</div>
+        <div class="tl-label">Intro &amp; Warm-Up</div>
+        <div class="tl-time">20 min</div>
+      </div>
+      <div class="tl-item seg-2">
+        <div class="tl-dot"></div>
+        <div class="tl-seg">Seg 2</div>
+        <div class="tl-label">5BLX Block 1</div>
+        <div class="tl-time">30 min</div>
+      </div>
+      <div class="tl-item seg-3">
+        <div class="tl-dot"></div>
+        <div class="tl-seg">Seg 3</div>
+        <div class="tl-label">Linear Function</div>
+        <div class="tl-time">30 min</div>
+      </div>
+      <div class="tl-item seg-4">
+        <div class="tl-dot"></div>
+        <div class="tl-seg">Seg 4</div>
+        <div class="tl-label">Exit Ticket</div>
+        <div class="tl-time">10 min</div>
+      </div>
+    </div>
+
+    <!-- ── TECH ── -->
+    <div class="segment tech">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Technical</div>
+          <div class="seg-title">Setup &amp; Attendance</div>
+        </div>
+        <div class="seg-pill">10 min</div>
+      </div>
+      <div class="seg-body">
+        <p>Get everyone settled and take attendance. Sort out any seating questions. This time does not count as instruction.</p>
+      </div>
+    </div>
+
+    <!-- ── SEGMENT 1 ── -->
+    <div class="segment">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Segment 1</div>
+          <div class="seg-title">Intro &amp; Warm-Up</div>
+        </div>
+        <div class="seg-pill">20 min</div>
+      </div>
+      <div class="seg-body">
+        <p>The tutor introduces themselves briefly, then opens it to the class. Go around the room and ask each student: their name, their school, their strongest section, and their weakest section (math or verbal). Keep it moving and keep the tone light. The goal is to get everyone talking and to flag where each student thinks they stand.</p>
+
+        <p>Then pivot to the big question: <em>"Do you think the SHSAT is going to be like any test you have studied for before?"</em> Let them answer. Then explain.</p>
+
+        <p>The SHSAT is a Digital Question Adaptive Test. The test is watching you while you take it. Answer the first 10 ELA questions correctly and the algorithm locks you into a high range for that section. Same for math. Those first 10 questions on each section are the most important questions on the entire exam — and we do not know the topics or the difficulty in advance.</p>
+
+        <div class="callout">&#9998; Write on the board: First 10 ELA + First 10 Math = Your range.</div>
+
+        <p>Every test they have taken so far in middle school has been topic-focused: one chapter, one unit, one skill. The SHSAT is cumulative. Any math concept from 4th grade through 8th grade could show up on question one. That includes:</p>
+
+        <div class="chip-row">
+          <span class="chip">Arithmetic</span>
+          <span class="chip">Absolute value</span>
+          <span class="chip">Inequalities</span>
+          <span class="chip">Negative numbers</span>
+          <span class="chip">Word problems</span>
+          <span class="chip">Ratios</span>
+          <span class="chip">Geometry</span>
+        </div>
+
+        <p>There is no way to know what comes first, which is exactly why preparation has to look different here. The best thing students can do for math is keep every skill agile through flashcards and constant repetition. For verbal, the system is <strong>5BLX</strong> — and that is what this class is built around.</p>
+
+        <p>Two more things that make the SHSAT unlike any test they have taken before. First, students <strong>cannot go back</strong> once they leave a reading passage. On most tests, you can jump around freely. Not here. Once you move past a passage, those questions are locked. Second, reading passages on the SHSAT are not uniform — a passage can carry 4, 5, or 7 questions. Students need to know this going in so they are not caught off guard.</p>
+      </div>
+    </div>
+
+    <!-- ── SEGMENT 2 ── -->
+    <div class="segment seg-2">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Segment 2</div>
+          <div class="seg-title">5BLX — Block 1</div>
+        </div>
+        <div class="seg-pill">30 min</div>
+      </div>
+      <div class="seg-body">
+        <p>Teach students the first block of <strong>5BLX</strong>, the core verbal system used throughout this course. Full lesson materials are in the Tutor Boost portal. Review the lesson there before class and teach it live to the group.</p>
+
+        <a class="link-card" href="https://www.katyasat.com/products/tutor-boost/categories/2156911010/posts/2194528586" target="_blank">
+          <div class="lc-icon">&#128218;</div>
+          <div class="lc-body">
+            <div class="lc-title">5BLX Block 1 — Tutor Boost</div>
+            <div class="lc-url">katyasat.com › tutor-boost › 5BLX Block 1</div>
+          </div>
+          <div class="lc-arrow">&#8599;</div>
+        </a>
+
+        <p style="margin-top:12px;">At the end of this segment, do a quick recall quiz. The student who remembers Block 1 best wins the prize.</p>
+      </div>
+    </div>
+
+    <!-- ── SEGMENT 3 ── -->
+    <div class="segment seg-3">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Segment 3</div>
+          <div class="seg-title">Anatomy of a Linear Function</div>
+        </div>
+        <div class="seg-pill">30 min</div>
+      </div>
+      <div class="seg-body">
+        <p>Walk students through the anatomy of a linear function — slope, intercepts, and how to read and build the equation of a line. Connect examples back to the word problem translation work from the warm-up so students see verbal and math skills working together.</p>
+
+        <a class="link-card" href="https://www.loom.com/share/ac392d98a1b84c6dbfadb1533b72a190" target="_blank">
+          <div class="lc-icon">&#127909;</div>
+          <div class="lc-body">
+            <div class="lc-title">Understanding the Anatomy of Linear Functions in Algebra</div>
+            <div class="lc-url">loom.com › share › ac392d98...</div>
+          </div>
+          <div class="lc-arrow">&#8599;</div>
+        </a>
+
+        <a class="link-card" href="https://katyanino.github.io/SHSAT/" target="_blank">
+          <div class="lc-icon">&#128200;</div>
+          <div class="lc-body">
+            <div class="lc-title">Anatomy of a Linear Function — Interactive Tool</div>
+            <div class="lc-url">katyanino.github.io/SHSAT &nbsp;·&nbsp; ivy tutors network</div>
+          </div>
+          <div class="lc-arrow">&#8599;</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── SEGMENT 4 ── -->
+    <div class="segment seg-4">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Segment 4</div>
+          <div class="seg-title">Exit Ticket</div>
+        </div>
+        <div class="seg-pill">10 min</div>
+      </div>
+      <div class="seg-body">
+        <p>Close the class by going around the room. Each student says out loud two things: one thing they learned today and one thing they are taking away from this class. No hands raised, no volunteering — everyone answers.</p>
+        <p>The teacher tosses the ball or crumpled newspaper to the first student. That student answers, then tosses it to the next person. Keep it moving until everyone has gone.</p>
+        <p>This is how every session ends. It keeps the energy up and makes sure every student walks out with something concrete.</p>
+      </div>
+    </div>
+
+    <!-- ── HOMEWORK ── -->
+    <div class="segment hw">
+      <div class="seg-head">
+        <div class="seg-accent"></div>
+        <div class="seg-head-text">
+          <div class="seg-tag">Homework</div>
+          <div class="seg-title">IXL Practice — Due Next Class</div>
+        </div>
+        <div class="seg-pill">Assign at end</div>
+      </div>
+      <div class="seg-body">
+        <p>Assign both IXL exercises before students leave. Tell them to aim for a score of at least 80 on each one.</p>
+        <div class="hw-list">
+          <a class="hw-item" href="https://www.ixl.com/math/grade-6/write-variable-expressions-word-problems" target="_blank">
+            <div class="hw-num">1</div>
+            <div class="hw-body">
+              <div class="hw-title">Write variable expressions: word problems</div>
+              <div class="hw-meta">IXL &nbsp;·&nbsp; Grade 6 Math</div>
+              <div class="hw-url">ixl.com/math/grade-6/write-variable-expressions-word-problems</div>
+            </div>
+          </a>
+          <a class="hw-item" href="https://www.ixl.com/math/grade-8/add-and-subtract-integers-word-problems" target="_blank">
+            <div class="hw-num">2</div>
+            <div class="hw-body">
+              <div class="hw-title">Add and subtract integers: word problems</div>
+              <div class="hw-meta">IXL &nbsp;·&nbsp; Grade 8 Math</div>
+              <div class="hw-url">ixl.com/math/grade-8/add-and-subtract-integers-word-problems</div>
+            </div>
+          </a>
+          <a class="hw-item" href="https://www.ixl.com/ela/grade-7/choose-between-subject-and-object-pronouns" target="_blank">
+            <div class="hw-num">3</div>
+            <div class="hw-body">
+              <div class="hw-title">Choose between subject and object pronouns</div>
+              <div class="hw-meta">IXL &nbsp;·&nbsp; Grade 7 ELA</div>
+              <div class="hw-url">ixl.com/ela/grade-7/choose-between-subject-and-object-pronouns</div>
+            </div>
+          </a>
+          <a class="hw-item" href="https://www.ixl.com/ela/grade-8/compare-illustrations-of-literary-and-historical-subjects" target="_blank">
+            <div class="hw-num">4</div>
+            <div class="hw-body">
+              <div class="hw-title">Compare illustrations of literary and historical subjects</div>
+              <div class="hw-meta">IXL &nbsp;·&nbsp; Grade 8 ELA</div>
+              <div class="hw-url">ixl.com/ela/grade-8/compare-illustrations-of-literary-and-historical-subjects</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="brand">ivy tutors network</div>
+    <div class="copy">SHSAT Prep &nbsp;·&nbsp; Queens, New York &nbsp;·&nbsp; Confidential</div>
+  </footer>
+
+</div><!-- /page -->
+</body>
+</html>
