@@ -1,466 +1,200 @@
-import { useState, useEffect, useRef } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Partial Agreement Trap — ivy tutors network</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f4f6fb; color: #222; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 0 48px; }
+.itn-header { background: #1B3878; padding: 16px 28px; display: flex; align-items: center; gap: 16px; }
+.itn-title { color: #fff; font-size: 15px; font-weight: 500; line-height: 1.3; }
+.itn-sub { color: #29ABE2; font-size: 12px; font-weight: 400; margin-top: 2px; }
+.card { background: #fff; border-radius: 0; padding: 28px 32px; border-bottom: 1px solid #e4e8f0; }
+.card:last-child { border-bottom: none; border-radius: 0 0 12px 12px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; padding: 3px 11px; border-radius: 99px; margin-bottom: 12px; text-transform: uppercase; }
+.tag-concept { background: #E6ECF8; color: #1A2263; }
+.tag-drill { background: #e6f4ec; color: #1a5c32; }
+.tag-walkthrough { background: #faeeda; color: #7a4800; }
+h2 { font-size: 18px; font-weight: 600; color: #1B3878; margin-bottom: 10px; }
+p { font-size: 15px; line-height: 1.75; color: #444; margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+.framework-box { border-left: 3px solid #29ABE2; padding: 12px 18px; background: #f0f6fb; border-radius: 0 8px 8px 0; margin: 16px 0; }
+.framework-box p { font-size: 14.5px; margin: 0; color: #1B3878; }
+.passage-block { background: #f7f8fb; border-radius: 10px; padding: 18px 22px; margin: 16px 0; font-size: 15.5px; line-height: 1.8; color: #222; border: 1px solid #e2e6f0; }
+.label { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+.label-a { background: #ede9fe; color: #3730a3; }
+.label-b { background: #d1fae5; color: #065f46; }
+.map-grid { display: grid; grid-template-columns: 1fr 28px 1fr; gap: 10px; align-items: start; margin: 18px 0; }
+.map-col-label { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.map-cell { background: #f7f8fb; border-radius: 8px; padding: 12px 15px; font-size: 13.5px; line-height: 1.55; color: #333; margin-bottom: 9px; border: 1px solid #e2e6f0; }
+.map-cell:last-child { margin-bottom: 0; }
+.map-cell.predict { border-top: 3px solid #6B5FD5; }
+.map-cell.finding-ok { border-top: 3px solid #2FAF04; }
+.map-cell.finding-clash { border-top: 3px solid #E63946; }
+.cell-badge { display: inline-block; font-size: 11px; font-weight: 600; margin-bottom: 5px; padding: 2px 8px; border-radius: 4px; }
+.badge-predict { background: #ede9fe; color: #3730a3; }
+.badge-clash { background: #fee2e2; color: #991b1b; }
+.badge-ok { background: #d1fae5; color: #065f46; }
+.map-arrow { display: flex; align-items: center; justify-content: center; padding-top: 40px; font-size: 22px; color: #aaa; }
+.verdict { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-radius: 9px; margin-top: 18px; font-size: 14.5px; }
+.verdict-contrast { background: #fff0f0; color: #8b1a1a; border: 1px solid #f4b8b8; }
+.q-passage { background: #f7f8fb; border-radius: 10px; padding: 18px 22px; margin: 16px 0; font-size: 15.5px; line-height: 1.8; color: #222; border: 1px solid #e2e6f0; }
+.blank { display: inline-block; border-bottom: 2px solid #1A2263; min-width: 56px; }
+.choices { display: flex; flex-direction: column; gap: 11px; margin-top: 16px; }
+.choice-btn { display: flex; align-items: center; gap: 16px; border: 1.5px solid #d1d5db; border-radius: 12px; padding: 15px 20px; background: #fff; cursor: pointer; text-align: left; font-size: 15.5px; color: #333; transition: border-color 0.15s, background 0.15s; font-family: inherit; }
+.choice-btn:hover:not(:disabled) { border-color: #6B5FD5; background: #f6f4ff; }
+.choice-btn:disabled { cursor: default; }
+.bubble { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #374151; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; color: #374151; background: #fff; }
+.choice-btn.correct { border-color: #2FAF04; background: #f0fae8; }
+.choice-btn.correct .bubble { border-color: #2FAF04; color: #1a7a00; background: #e6f9d8; }
+.choice-btn.incorrect { border-color: #E63946; background: #fff5f5; }
+.choice-btn.incorrect .bubble { border-color: #E63946; color: #b91c1c; background: #fee2e2; }
+.choice-btn.reveal-correct { border-color: #2FAF04; background: #f0fae8; }
+.choice-btn.reveal-correct .bubble { border-color: #2FAF04; color: #1a7a00; background: #e6f9d8; }
+.feedback { margin-top: 14px; padding: 14px 18px; border-radius: 9px; font-size: 14.5px; line-height: 1.7; display: none; }
+.feedback.correct { background: #f0fae8; color: #1a5c32; border: 1px solid #86efac; }
+.feedback.incorrect { background: #fff5f5; color: #7f1d1d; border: 1px solid #fca5a5; }
+</style>
+</head>
+<body>
+<div class="wrap">
 
-const LOGO_SRC = "data:image/png;base64,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";
-
-const CATEGORIES = [
-  { id: "continuous", label: "Continuous", emoji: "➡️", color: "#29ABE2", desc: "The second part adds to or continues the first idea" },
-  { id: "reversal", label: "Reversal", emoji: "🔄", color: "#E63946", desc: "The second part contrasts or contradicts the first" },
-  { id: "cause_effect", label: "Cause & Effect", emoji: "⚡", color: "#F4A261", desc: "The first part leads to or causes the second" },
-  { id: "clarifying", label: "Clarifying", emoji: "🔍", color: "#2FAF04", desc: "The second part explains, specifies, or gives examples" },
-  { id: "sequential", label: "Sequential", emoji: "📋", color: "#6B3FA0", desc: "Events happen in a time-based order" },
-];
-
-const QUESTIONS = [
-  {
-    id: 1,
-    body: 'Gold and selenium are among the elements contained in the salty, concentrated brine that remains after seawater is desalinated. Elements can be extracted from this brine in much the same way that materials are mined from the earth. _____ recovering materials from desalination by-products is known as brine mining.',
-    choices: ["Next,", "Rather,", "Fittingly,", "Granted,"],
-    answer: 2,
-    category: "clarifying",
-    explanation: "The blank introduces a label (brine mining) that names what was just described. That's a clarifying move."
-  },
-  {
-    id: 2,
-    body: 'The United Nations\u2019 Trade and Development organization divides exports into five key categories: food items, agricultural materials, fuels, ores and raw metals, and manufactured goods (i.e., most nonfood goods made by machinery or by hand). In 2022, the majority (79 percent) of Italy\u2019s exports were manufactured goods. _____ medicines, garments, cars, and vehicle parts were its top exports.',
-    choices: ["Within this category,", "Despite this majority,", "In a broader sense,", "In the future,"],
-    answer: 0,
-    category: "clarifying",
-    explanation: "The second part zooms in on what the manufactured goods actually were. It clarifies what falls within that category."
-  },
-  {
-    id: 3,
-    body: 'Researchers in France claim that lions and koalas are among the twenty most \u201ccharismatic\u201d animals (defined as \u201cattractive, fascinating, or appealing\u201d). To create their top-twenty list, researchers used survey data from Western Europe. European attitudes toward lions and koalas might not be shared around the world, _____',
-    choices: ["in other words.", "for example.", "in particular.", "of course."],
-    answer: 3,
-    category: "clarifying",
-    explanation: "\"Of course\" signals that the limitation (European data only) is an obvious, expected point. It clarifies what should already be apparent."
-  },
-  {
-    id: 4,
-    body: 'When the first railroads were built in Australia in the 1800s, a variety of track sizes (gauges) were used across the continent, resulting in what historians call the \u201crailway gauge muddle.\u201d The Big Pineapple Railway line in Queensland used narrow tracks. _____ the Yarra Valley Railway line in Victoria used broad gauge tracks.',
-    choices: ["In fact,", "Meanwhile,", "For example,", "Likewise,"],
-    answer: 1,
-    category: "continuous",
-    explanation: "Both sentences describe different railway lines that existed at the same time. The second continues the picture of variety across Australia."
-  },
-  {
-    id: 5,
-    body: 'In 1965, Morrie Turner\u2019s comic strip <em>Wee Pals</em> became the first serial comic by a Black cartoonist to be syndicated, appearing in papers nationwide. Comics by other Black cartoonists followed. _____ Robb Armstrong (<em>Jump Start</em>) and Keith Knight (<em>The Knight Life</em>) joined the ranks of syndicated Black cartoonists in 1989 and 2008, respectively.',
-    choices: ["However,", "For instance,", "Previously,", "Alternatively,"],
-    answer: 1,
-    category: "clarifying",
-    explanation: "Armstrong and Knight are specific examples of the \"other Black cartoonists\" who followed. The second part illustrates the claim."
-  },
-  {
-    id: 6,
-    body: 'For several centuries after the birth of opera in sixteenth-century Florence, Italian remained the default language in which most opera scores were written. _____ opera singers today, such as the soprano Pretty Yende, encounter a wide range of Italian terms\u2014from <em>furioso</em> (furiously) to <em>affrettando</em> (at a hurried tempo)\u2014when following many eighteenth-century opera scores.',
-    choices: ["However,", "Thus,", "Lastly,", "Granted,"],
-    answer: 1,
-    category: "cause_effect",
-    explanation: "Because Italian was the default language for centuries, singers today still encounter Italian terms. The first fact causes the second."
-  },
-  {
-    id: 7,
-    body: 'Unlike the sprawling, permanent mural installations of Elena Huerta Muzquiz and other contemporaries of the Muralismo Mexicano movement, the easily reproducible block print posters that Xavier Guerrero and Francisco Dosamantes created as part of the printmaking collective Taller de Gr\u00e1fica Popular (TGP) were highly portable. _____ the prints were a boon to the TGP\u2019s goal of spreading their artwork throughout Mexico and the world beyond.',
-    choices: ["For instance,", "As such,", "Despite this,", "To be exact,"],
-    answer: 1,
-    category: "cause_effect",
-    explanation: "The prints were portable, so (as a result) they helped spread artwork widely. Portability caused the benefit."
-  },
-  {
-    id: 8,
-    body: 'The moon Elara orbits Jupiter in the same direction that the planet rotates. _____ Elara\u2019s orbit is described as prograde. Mneme, another of Jupiter\u2019s moons, orbits in the opposite direction, so its orbit is described with the opposite term: retrograde.',
-    choices: ["Next,", "Nevertheless,", "Hence,", "In reality,"],
-    answer: 2,
-    category: "cause_effect",
-    explanation: "Because Elara orbits in the same direction as Jupiter\u2019s rotation, its orbit is therefore called prograde. Direct cause and effect."
-  },
-  {
-    id: 9,
-    body: 'In 1845, the United States District Court for the state of Iowa was established. Initially, the court\u2019s jurisdiction was a single district that encompassed the entire state, but as Iowa\u2019s population grew, this single district began to struggle to serve the needs of everyone in the state. _____ the court\u2019s jurisdiction was subdivided into two districts, each with its own district court.',
-    choices: ["Nevertheless,", "Additionally,", "Ultimately,", "For example,"],
-    answer: 2,
-    category: "sequential",
-    explanation: "The passage traces a timeline: the court was established, population grew, problems arose, and eventually (ultimately) it was subdivided."
-  },
-  {
-    id: 10,
-    body: 'A research team led by Gal Badihi has discovered that chimpanzees communicate through exchanges of gestures occurring at a pace similar to that of human conversations. _____ chimpanzee gesture exchanges have short pauses of about 120 milliseconds between communications, comparable to the 200-millisecond average pause between turns in human speech.',
-    choices: ["By contrast,", "Nevertheless,", "As a result,", "Specifically,"],
-    answer: 3,
-    category: "clarifying",
-    explanation: "The second part gives the specific data (120 ms vs. 200 ms) that supports the general claim. It zooms in with details."
-  },
-  {
-    id: 11,
-    body: 'The Duchy of Amalfi, a sea power based in the Mediterranean port city of Amalfi that reached the height of its influence around 1000 CE, is classified as a thalassocracy. Thalassocracies are generally considered distinct from tellurocracies, or land-based powers. _____ the British Empire (1600s\u20131900s CE) notably extended its hegemony across both land and sea.',
-    choices: ["Blurring this line,", "Exemplifying this distinction,", "Underscoring this difference,", "Supporting this claim,"],
-    answer: 0,
-    category: "reversal",
-    explanation: "The British Empire doesn\u2019t fit neatly into either category. It contradicts the neat distinction just described, blurring the line."
-  },
-  {
-    id: 12,
-    body: 'According to climate envelope models, individual organisms that inhabit the coolest areas of their species\u2019 geographic distribution are expected to benefit from a warming climate, while individuals in the warmest areas will struggle. A 2024 University of Arizona study, _____ found that warmer-than-average temperatures resulted in a decrease in growth across all areas of the common pi\u00f1on tree\u2019s distribution range.',
-    choices: ["though,", "therefore,", "moreover,", "for example,"],
-    answer: 0,
-    category: "reversal",
-    explanation: "The model predicted some organisms would benefit, but the actual study found harm everywhere. The finding contradicts the expectation."
-  },
-  {
-    id: 13,
-    body: 'Known as an \u201cempire on which the sun never sets,\u201d the Spanish Empire once controlled portions of five continents. Its legacy can still be seen, and heard, in the Spanish-speaking nation of Uruguay, which gained its independence from Spain in the nineteenth century. _____ a former colony\u2019s tie to the Spanish Empire is so tenuous that Spanish is seldom spoken there; an example is Belgium, which ceased to be part of the empire in 1714.',
-    choices: ["On the other hand,", "In addition,", "At the same time,", "Sometimes,"],
-    answer: 0,
-    category: "reversal",
-    explanation: "Uruguay still shows Spain\u2019s influence, but Belgium does not. The second part presents the opposite case."
-  },
-];
-
-const LETTERS = ["A", "B", "C", "D"];
-
-export default function TransitionsPractice() {
-  const [currentQ, setCurrentQ] = useState(0);
-  const [phase, setPhase] = useState("category"); // category | answer | feedback
-  const [selectedCat, setSelectedCat] = useState(null);
-  const [catCorrect, setCatCorrect] = useState(null);
-  const [selectedAns, setSelectedAns] = useState(null);
-  const [ansCorrect, setAnsCorrect] = useState(null);
-  const [score, setScore] = useState(0);
-  const [catScore, setCatScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-  const [history, setHistory] = useState([]);
-  const [showStart, setShowStart] = useState(true);
-  const cardRef = useRef(null);
-
-  const q = QUESTIONS[currentQ];
-
-  useEffect(() => {
-    if (cardRef.current) {
-      cardRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [currentQ, phase]);
-
-  const handleCategoryPick = (catId) => {
-    setSelectedCat(catId);
-    const correct = catId === q.category;
-    setCatCorrect(correct);
-    if (correct) setCatScore(s => s + 1);
-  };
-
-  const proceedToAnswer = () => {
-    setPhase("answer");
-  };
-
-  const handleAnswerPick = (idx) => {
-    setSelectedAns(idx);
-    const correct = idx === q.answer;
-    setAnsCorrect(correct);
-    if (correct) setScore(s => s + 1);
-    setHistory(h => [...h, { id: q.id, catRight: selectedCat === q.category, ansRight: correct, answer: LETTERS[q.answer] }]);
-    setPhase("feedback");
-  };
-
-  const nextQuestion = () => {
-    if (currentQ + 1 >= QUESTIONS.length) {
-      setFinished(true);
-    } else {
-      setCurrentQ(c => c + 1);
-      setPhase("category");
-      setSelectedCat(null);
-      setCatCorrect(null);
-      setSelectedAns(null);
-      setAnsCorrect(null);
-    }
-  };
-
-  const restart = () => {
-    setCurrentQ(0);
-    setPhase("category");
-    setSelectedCat(null);
-    setCatCorrect(null);
-    setSelectedAns(null);
-    setAnsCorrect(null);
-    setScore(0);
-    setCatScore(0);
-    setFinished(false);
-    setHistory([]);
-    setShowStart(true);
-  };
-
-  const catObj = CATEGORIES.find(c => c.id === q.category);
-
-  if (showStart) {
-    return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0e1f4d 0%, #1B3878 40%, #29ABE2 100%)", display: "flex", flexDirection: "column" }}>
-        <Header />
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-          <div style={{ background: "white", borderRadius: 20, padding: "48px 40px", maxWidth: 560, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🔗</div>
-            <h2 style={{ fontFamily: "'Georgia', serif", fontSize: 28, color: "#1B3878", margin: "0 0 12px" }}>Transitions Practice</h2>
-            <p style={{ color: "#555", fontSize: 15, lineHeight: 1.7, margin: "0 0 28px" }}>
-              13 questions from the March 2026 SAT. For each one, you will first identify the <strong>relationship</strong> between the two parts of the passage, then choose the best transition.
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginBottom: 32 }}>
-              {CATEGORIES.map(c => (
-                <span key={c.id} style={{ background: c.color + "18", color: c.color, fontWeight: 700, fontSize: 13, padding: "6px 14px", borderRadius: 20, border: `1.5px solid ${c.color}40` }}>
-                  {c.emoji} {c.label}
-                </span>
-              ))}
-            </div>
-            <button onClick={() => setShowStart(false)} style={{ background: "#1B3878", color: "white", border: "none", borderRadius: 12, padding: "16px 48px", fontSize: 17, fontWeight: 700, cursor: "pointer", transition: "transform 0.15s", letterSpacing: 0.5 }}
-              onMouseEnter={e => e.target.style.transform = "scale(1.04)"}
-              onMouseLeave={e => e.target.style.transform = "scale(1)"}>
-              Start Practice
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (finished) {
-    return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0e1f4d 0%, #1B3878 40%, #29ABE2 100%)", display: "flex", flexDirection: "column" }}>
-        <Header />
-        <div style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "32px 16px", overflowY: "auto" }}>
-          <div style={{ background: "white", borderRadius: 20, padding: "40px 36px", maxWidth: 560, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <div style={{ fontSize: 52, marginBottom: 8 }}>{score >= 11 ? "🏆" : score >= 8 ? "💪" : "📚"}</div>
-              <h2 style={{ fontFamily: "'Georgia', serif", fontSize: 26, color: "#1B3878", margin: "0 0 6px" }}>Practice Complete!</h2>
-              <p style={{ color: "#666", fontSize: 14, margin: 0 }}>Here is how you did:</p>
-            </div>
-            <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
-              <ScoreBox label="Answers" value={score} total={13} color="#1B3878" />
-              <ScoreBox label="Categories" value={catScore} total={13} color="#29ABE2" />
-            </div>
-            <div style={{ marginBottom: 24 }}>
-              <h3 style={{ fontSize: 14, color: "#888", textTransform: "uppercase", letterSpacing: 1.5, margin: "0 0 12px", fontFamily: "sans-serif" }}>Results</h3>
-              {history.map((h, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: "1px solid #eee" }}>
-                  <span style={{ background: "#1B3878", color: "white", fontWeight: 700, fontSize: 12, width: 28, height: 28, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{h.id}</span>
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{h.ansRight ? "✅" : "❌"}</span>
-                  <span style={{ fontSize: 13, color: "#555", flex: 1 }}>
-                    {h.ansRight ? "Correct" : `Answer: ${h.answer}`}
-                    {h.catRight ? "" : " · Category missed"}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <button onClick={restart} style={{ width: "100%", background: "#1B3878", color: "white", border: "none", borderRadius: 12, padding: "14px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0e1f4d 0%, #1B3878 40%, #29ABE2 100%)", display: "flex", flexDirection: "column" }}>
-      <Header />
-      {/* Progress */}
-      <div style={{ padding: "12px 20px 0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, maxWidth: 680, margin: "0 auto" }}>
-          <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, fontWeight: 600, fontFamily: "sans-serif", whiteSpace: "nowrap" }}>{currentQ + 1} / {QUESTIONS.length}</span>
-          <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.15)", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{ width: `${((currentQ + (phase === "feedback" ? 1 : 0)) / QUESTIONS.length) * 100}%`, height: "100%", background: "#29ABE2", borderRadius: 3, transition: "width 0.4s ease" }} />
-          </div>
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontFamily: "sans-serif", whiteSpace: "nowrap" }}>Score: {score}</span>
-        </div>
-      </div>
-
-      {/* Main card */}
-      <div style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "16px 16px 32px" }}>
-        <div ref={cardRef} style={{ background: "white", borderRadius: 20, maxWidth: 680, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)", overflow: "hidden", maxHeight: "calc(100vh - 140px)", overflowY: "auto" }}>
-          {/* Question number bar */}
-          <div style={{ background: "#f0f3f9", padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #e2e7f0" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ background: "#1A2263", color: "white", fontWeight: 700, fontSize: 16, width: 38, height: 38, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>{q.id}</span>
-              <span style={{ color: "#6B7280", fontSize: 14, fontFamily: "sans-serif" }}>Transition Question</span>
-            </div>
-            <PhaseIndicator phase={phase} />
-          </div>
-
-          {/* Passage */}
-          <div style={{ padding: "24px 28px 20px" }}>
-            <p style={{ fontSize: 14, color: "#888", textTransform: "uppercase", letterSpacing: 1.2, margin: "0 0 10px", fontWeight: 600, fontFamily: "sans-serif" }}>
-              Which choice completes the text with the most logical transition?
-            </p>
-            <p style={{ fontSize: 16, color: "#333", lineHeight: 1.85, margin: 0, fontFamily: "'Georgia', serif" }}
-              dangerouslySetInnerHTML={{ __html: q.body.replace("_____", '<span style="display:inline-block;width:60px;border-bottom:2.5px solid #29ABE2;margin:0 3px;vertical-align:middle"></span>') }} />
-          </div>
-
-          <div style={{ height: 1, background: "#e8ecf3", margin: "0 28px" }} />
-
-          {/* Step 1: Category */}
-          {phase === "category" && (
-            <div style={{ padding: "24px 28px 28px" }}>
-              <p style={{ fontSize: 15, fontWeight: 700, color: "#1B3878", margin: "0 0 6px", fontFamily: "sans-serif" }}>
-                Step 1: What is the relationship?
-              </p>
-              <p style={{ fontSize: 13, color: "#777", margin: "0 0 16px", fontFamily: "sans-serif" }}>
-                Read both parts of the passage. How does the second part connect to the first?
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {CATEGORIES.map(cat => {
-                  const isSelected = selectedCat === cat.id;
-                  const showResult = selectedCat !== null;
-                  const isCorrect = cat.id === q.category;
-                  let bg = "white";
-                  let border = `1.5px solid #d4d8e0`;
-                  let opacity = 1;
-                  if (showResult && isCorrect) { bg = cat.color + "12"; border = `2px solid ${cat.color}`; }
-                  else if (showResult && isSelected && !isCorrect) { bg = "#fef2f2"; border = "2px solid #E63946"; }
-                  else if (showResult) { opacity = 0.45; }
-
-                  return (
-                    <button key={cat.id} onClick={() => !showResult && handleCategoryPick(cat.id)}
-                      disabled={showResult}
-                      style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, border, background: bg, cursor: showResult ? "default" : "pointer", transition: "all 0.2s", opacity, textAlign: "left" }}>
-                      <span style={{ fontSize: 22, flexShrink: 0 }}>{cat.emoji}</span>
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontWeight: 700, fontSize: 15, color: "#333", fontFamily: "sans-serif" }}>{cat.label}</span>
-                        <span style={{ display: "block", fontSize: 12, color: "#888", marginTop: 2, fontFamily: "sans-serif" }}>{cat.desc}</span>
-                      </div>
-                      {showResult && isCorrect && <span style={{ fontSize: 18 }}>✅</span>}
-                      {showResult && isSelected && !isCorrect && <span style={{ fontSize: 18 }}>❌</span>}
-                    </button>
-                  );
-                })}
-              </div>
-              {selectedCat !== null && (
-                <div style={{ marginTop: 16 }}>
-                  <div style={{ background: catCorrect ? "#f0fdf4" : "#fef9ee", border: `1px solid ${catCorrect ? "#bbf7d0" : "#fde68a"}`, borderRadius: 12, padding: "14px 18px", marginBottom: 14 }}>
-                    <p style={{ margin: 0, fontSize: 14, color: catCorrect ? "#166534" : "#92400e", fontFamily: "sans-serif", lineHeight: 1.6 }}>
-                      {catCorrect
-                        ? <><strong>Nice!</strong> This is a <strong>{catObj.label.toLowerCase()}</strong> relationship. Now pick the transition that fits.</>
-                        : <><strong>Not quite.</strong> The relationship here is <strong>{catObj.label.toLowerCase()}</strong>: {catObj.desc.toLowerCase()}. Use that to find the right transition.</>
-                      }
-                    </p>
-                  </div>
-                  <button onClick={proceedToAnswer} style={{ width: "100%", background: "#1B3878", color: "white", border: "none", borderRadius: 12, padding: "14px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>
-                    Choose Your Answer →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Step 2: Answer */}
-          {phase === "answer" && (
-            <div style={{ padding: "24px 28px 28px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ background: catObj.color + "18", color: catObj.color, fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: 16, fontFamily: "sans-serif" }}>
-                  {catObj.emoji} {catObj.label}
-                </span>
-                <p style={{ fontSize: 15, fontWeight: 700, color: "#1B3878", margin: 0, fontFamily: "sans-serif" }}>
-                  Step 2: Pick the best transition
-                </p>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {q.choices.map((choice, idx) => (
-                  <button key={idx} onClick={() => handleAnswerPick(idx)}
-                    style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderRadius: 14, border: "1.5px solid #d4d8e0", background: "white", cursor: "pointer", transition: "all 0.15s", textAlign: "left" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = "#1B3878"; e.currentTarget.style.background = "#f8faff"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#d4d8e0"; e.currentTarget.style.background = "white"; }}>
-                    <span style={{ width: 34, height: 34, borderRadius: "50%", border: "1.5px solid #374151", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500, color: "#374151", flexShrink: 0, fontFamily: "sans-serif" }}>{LETTERS[idx]}</span>
-                    <span style={{ fontSize: 16, color: "#333", fontFamily: "'Georgia', serif" }}>{choice}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Feedback */}
-          {phase === "feedback" && (
-            <div style={{ padding: "24px 28px 28px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-                {q.choices.map((choice, idx) => {
-                  const isCorrectChoice = idx === q.answer;
-                  const isSelectedChoice = idx === selectedAns;
-                  let bg = "white";
-                  let border = "1.5px solid #e5e7eb";
-                  let opacity = 0.5;
-                  let bubbleBg = "white";
-                  let bubbleBorder = "#9ca3af";
-                  let bubbleColor = "#9ca3af";
-
-                  if (isCorrectChoice) {
-                    bg = "#f0fdf4"; border = "2px solid #2FAF04"; opacity = 1;
-                    bubbleBg = "#2FAF04"; bubbleBorder = "#2FAF04"; bubbleColor = "white";
-                  } else if (isSelectedChoice && !ansCorrect) {
-                    bg = "#fef2f2"; border = "2px solid #E63946"; opacity = 1;
-                    bubbleBg = "#E63946"; bubbleBorder = "#E63946"; bubbleColor = "white";
-                  }
-
-                  return (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderRadius: 14, border, background: bg, opacity, transition: "all 0.3s" }}>
-                      <span style={{ width: 34, height: 34, borderRadius: "50%", border: `2px solid ${bubbleBorder}`, background: bubbleBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: bubbleColor, flexShrink: 0, fontFamily: "sans-serif" }}>
-                        {isCorrectChoice ? "✓" : isSelectedChoice && !ansCorrect ? "✗" : LETTERS[idx]}
-                      </span>
-                      <span style={{ fontSize: 16, color: "#333", fontFamily: "'Georgia', serif" }}>{choice}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div style={{ background: ansCorrect ? "#f0fdf4" : "#fef2f2", border: `1px solid ${ansCorrect ? "#bbf7d0" : "#fecaca"}`, borderRadius: 12, padding: "16px 18px", marginBottom: 16 }}>
-                <p style={{ margin: 0, fontSize: 14, color: ansCorrect ? "#166534" : "#991b1b", fontFamily: "sans-serif", lineHeight: 1.7 }}>
-                  <strong>{ansCorrect ? "Correct! " : `The answer is ${LETTERS[q.answer]}. `}</strong>
-                  {q.explanation}
-                </p>
-              </div>
-              <button onClick={nextQuestion} style={{ width: "100%", background: "#1B3878", color: "white", border: "none", borderRadius: 12, padding: "14px", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "sans-serif" }}>
-                {currentQ + 1 >= QUESTIONS.length ? "See Results" : "Next Question →"}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+  <div class="itn-header">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAF8AXwDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAcIBQYBAwQJAv/EAEYQAAIBAwICBQcKBAQFBQEAAAABAgMEBQYRITEHEkFRgQgTIkJhcZEUFSMyNlJ1obGyYoKzwRYzQ9EkY3KS8BclJqLS4f/EABwBAQACAwEBAQAAAAAAAAAAAAAGBwEDBQQCCP/EADMRAAIBAgMFBgcBAAIDAAAAAAABAgMEBRExBhIhQXETFCJRscEyM2GBodHhkRVCByPw/9oADAMBAAIRAxEAPwC5YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaS3b2SNC1f0r6W0/Vnawq1Mldw4Ola7NRfc5PgvDc0vp56QbindVNL4au6agtrytB7Nt+on+pCJKMLwFVoKrX0ei/ZrlPyJrqdPlfzr83pin5vfh1r17/sNj0z016byNaNDKW9xiqknspzaqUvGS4rxRXHsGx2KmAWU45KOXRv3zPnfZdu1uKF1bwuLatCtSmt4zhLdNexnYVg6Idf3OlspTsr2tKeIrzUakZP/Jb9dd3tRZ6EozgpxalGS3TT4NEPxHDp2NTdlxT0ZsjLM5ABzz6AAAAAAB5clkLPHW7r3txCjBfefF+5dp+M3kaOKxtW9r/VguEe2T7EQ1msrd5a9nc3dRybfox9WC7kjp4dh0rt5t5RRwMcx2GGxUYrOb0Xl9Wb1f8ASJaU5yjZWFWulylUmoJ+GzZ023SPFz/4jFOMe+nW3fwaRHoJEsHtEst38sg8tqMSc97fy+mSy9MybMJn8ZmI/wDB3H0iXGnNbSXgZQgO3r1ratGtQqSp1IveMovZolvQ+fWbxzjWaV3R2VRL1l2SRw8Rwp2y7Sm84+hLsC2iV/Lsayyny8n/AE2EAHGJSAAAAAAD81atOjTlUqzjCEVu5SeyRzOUYRcpNKKW7b7ERbq7UFXLXcqVGcoWcHtCPLre1nFxvGqWFUd+XGT0Xn/DDeRtOT1vjbebp2tKpdSXrL0Y/F/7GPhr+fWXWxker27VuP6GjnJW9ba/FKk96M1FeSS902a95kp4fVeKyM40uvK3rPgoVeG/ufIzxBvJ7m96B1DUqTji72o5tr6Gcnx/6WSfANrXdVVb3aSk9Gub8mfUZeZu4AJ2fYAAAAAAAAAAAAAAAAAAAAAPHm7yOOw17fy+rbW86r/li3/Y9hhtdW07zReatae/Xq2FaEdu9wZspJSqRT0zBT++ua17eVru4m51q9R1Jyb5tvdnUcI5LVSSWSPOAAZBxyLT9B2Wq5bo6sJV5udW1crWUm921D6v/wBXEqwyynk229Sj0dupNbKve1Zw9q2jH9Ysj+0kYu0Teqa9z7hqSWACCm0AAAAAAj7pbvZde0sIt9XZ1Je18kaAbp0s0pRy9tVa9GVLZP3M0snGFRStIZFRbRzlLEam9y9MkAAdA4gM/oC9lZ6mt9m+rWbpyXvMAZXSNOVXUljCK3fnUzz3UVKhNS0yZ7cOnKF3TlDXeXqTWACvy6wAAAAADA68u5Wunayg9pVWqe/sfMiskvpJpylgIyit1GqtyNCpttpzeIKL0UVl+TXLU5ABDj5B2Wtadvc069N7SpyUlt7DrC4vZcz6hJxknHVGCbLSqq9rSrL14KXxR2nlxFN0sVa05c40op/A9R+hKLcqcXLXJG9AAGwAAAAAAAAAAAAAAAAAAA4klKLi1umtmcgAqZ0qaXraX1Zc23m2rOtJ1bWe3Bwb328ORqhcHWulsXqvEysMlT4rjSqx+vTl3pletX9FOqcHWnO1tJ5SzTfVq20etLb2w5rw3J3hWM0q9NQqvKa8+ZqlHI0MHfUsr2lW8zVs7iFTfbqSpSUvhsbHpro81bnq0VbYmvb0W+Ne5i6UEu/jxfgmdmpXpUo705JI+DA4PGXmZy1vjLCk6lxcTUILsW/a/YuZcDS2IoYHT1jh7fjTtaKh1tvrPtl4vd+JrfRn0eY3R9B13JXWSqR2qXDW3VXdFdiN2IPjWKK8moU/hX5ZtjHIAA4Z9gAAAAAGtdIeHnk8M6tCPWr2z68Uucl2oiR8HsywBpWrdEwvas7zFuFKtLjOk+EZP2dzO9hOJRorsqunJkN2lwGpdS7zbrOXNef1RGgPff4bKWM3G6sLint63Ubi/FcDptrC9upqFvaV6sm9toU2yTKrBreTWRX8rerGW44vPyy4nmN86LMPOVeeXrQahFOFHftfazp03oS6rVI18v8AQUlx80nvKXv7iR6FGlQgow0YRp04LaMYrZJHBxXE4ODo0nnnqyZbObP1Y1Vc3CyS0T1z8/pkfsAEZLAAAAAAAPJl7KGQxteznslUjsn3PsZD17bVrS6qW1eDhUpycZJk2GD1Pp23zMPOJqlcxW0au3P2Mim1GAyxKmqtH5kfyvL9HzKOZFJyZXJady1hNqrZ1JwXKdNdaL+HIx0LevOfUhRqSl3KDbKprWdejPcqQaf1RrOpmZ0hip5PL0o9V+ZpNTqP2LsPRhtJZS+nGVak7Wj2yqLZv3IkTDYy1xVmra1hsucpPnJ97JTs9szXua0a1xHdprjx1f28jMY5ntSSSS5IAFsG0AAAAAAAAAAAAAAAAAAAAAAAAAHgzWaxOFtnc5bIW1lSXrVqijuZjFyeSWbB7wR9V6ZujqnW809QU5PfbeNOTj8djZdN6u03qKO+GzNpeS7YQqLrLw5noqWdxTjvTg0vqmDOAA8wAB+atSnSpyqVZxhCK3lKT2SXtYB+gaHnumDo5wtxK3vdT2bqx+tCi3Ua/wC3cYHpg6Oc1cRt7PU9mqs/qwrN02/+7Y9fcLrd3+zll0Zp7xSzy3ln1N8B+aVSnVpxqUpxnCS3jKL3TXvP0eQ3AAAAAAAAAAAAAGDzerdOYaXUyGWtqNT7nX3l8EYy26StGXFVU45mlBt7bzi4r4tGiV1Ri92U0n1RoldUIS3ZTSfVG3g6bK7tb2gq9pcUq9J8pU5Jo7jcmnxRuTTWaAAMmQAAAAAAAAADH5nOYjDUvO5PIW9rH/mTSb8DXP8A1R0R53zfz1T37+pLb47GipdUKTynNJ/Vo0zuKVN5Tkl9zcwY/DZvE5mj53GZC3uo/wDLmm14GQNsZRks4vNG2MlJZpgAH0ZAAAAAAAAAAAAAAANC6aOkO20Fp7z1OMK+Uud4WlCT4b9s5fwr8+RTzU+oszqTJVMhmr+td15vf05cI+xLkl7jbfKFz1bOdJ+TUpydCyn8loxb5KPP89yPUWVgeG07W3jNrxyWbfsYHE77G8u7C6hdWdxVt69N7wqU5OMk/ejoB3Gk1kwWr8nvpZq6o/8AjmoasXlacOtQr8vlEVzT/iX5k1Hz509lLnCZyyy1nNxr2laNWDXbs+K8Vw8S/wBjLqnfY22vaX+XcUYVYe6STX6lebRYdC0rKpTWUZcvJmRk761xuPuMhe1o0ba3pupVqSeyjFLdspB04dM2b11k69jjrisYScaFCEuracuO/uZXQ7eyeFU3T73UWbb4fTLn1I9i93JS7GLyXM53G7OATg4JLXQh0z53Q+UoWORuat/p+pNRrW9SXWlRTf16bfJru5Mu9jb21yWPoX9lWhXtaimqlKpF7qUWt0z5jltfIz15844a50Tf1t7mwj56z6z4zot+lFf9La8GQnanB4On3uksmvi+q8zu4TeSUuxm+D0/RYsAFfkiAAAAAABCvTH0k3NK8q6fwFd0lT9G5uYP0m+2MX2LvZJHSPnY6e0le38ZJV+o4UV3zfL4cyqNWc6tWVSpJynKTlJvm2+0j+PXs6EY0ocHLn9CM4/iUqKVCk8m9en9FSc6s3OpOU5t7uUnu2fk5BDiGGb0jqnMaZv43OOuZqG/wBJRk/Qmu5r+5ZzReo7PVGCo5O09Fy9GrTb404rmmVHZJXQBqCWM1TLF1qm1rfR22b4RqLk/wCx2sHxF29RU5vwP8HfwLEJ0ayoyfhlw6MsQACbk6AAAAAABH3TDr9aSsYWWP6lTK3C3h1uKox+812vuRvGVvrfG264v7qahRt6bqTk+xJblQtY5y41FqK7ytw3vWm+pF+rFcl8DgY/ibs6KjTfjl+F5nHxi/drS3YPxS/CPHlclf5W8nd5C6q3Nab3cqkt2eTj3gFcyk5POTzZCHJyebPXiclf4q8hd4+6q21aD3UoS2LJ9D+voausJ2d71aeVtop1EuCqx++v7lYTP9HuZq4HWONyNOTUY14wqrf61OT2kvg/yOvg+J1LOvFZ+Bvivc6WGX87Wqln4Xqi3wCe63BZxPQAAAAAAAAAAAAHyAfIAoT0i8de57fj/wC41/3swBn+kX7e578Rr/vZgC4bf5Uei9DAABtMB8n7i/WgfsLgPw23/pxKCvk/cX60D9hcB+G2/wDTiRHa35VPqzJAnl2WdWeK0rkIp+ao17mjP2SnGm1+xlVT6E9OGjYa46OshhopfK4x8/aSfq1YcV8eK8T59XNCrbXNS3r05U6tKThOMlxi09mjq7JXUatl2XODf5eZF8YouFff5P2OsAEpOUDO6B1LfaQ1fjdRY+bVazrKbjvwqQ5Tg/Y4trxMED4qU41IOElmnwMxk4tNao+mGm8xZagwNlmcdUVS1vKMatNp9jXJ+1cvAyBWTyL9d9ejdaGv63pQ3uLDrPs9eC/X4lmynMTsZWNzKi9Fp05E1ta6r0lNAAHPPQADAa6y6xOEqOEtq9b6On482bKNKVWahHVmi5uIW1GVWeiWZGPTTlZZaN1Qoy3t7WPVglyb3XWf5fkQ0iUK8FWhOFT0lNNS37dyOMnaTsr6pby9V+i+9dhy9usMdB0a8F4ct378X+c2VQryV3WnUnq3n/8AdDzgAr02HBnNDQlLUdCcd/o4yk33cNv7mDN50DjnQs531RbTr8IeyK/3Z47+qqdCX14HTwihKtdwy5cX9iwOkMosph6dSUt61P0Knv7/ABMwRZofK/NuYjCpLahX9Ce/Y+xkpk+2bxT/AJCyjKT8ceD/AH9yxYvNAAEgPoAHhz+TtsNh7rJ3clGlb03N+3uRiUlFOT0RiUlFZsifykNVeZtKOlrOp6dbatdtPlD1Y+L4+C7yCDI6ky1znM5d5S6k3VuKjm/YuxeCMcVVil6725lU5aLoV7f3Tuq7qcuXQAA554gejGUJ3WRtramt51q0Kcfe2kv1POSb5PumHltUrM3EG7TGvrx3XCVX1V4c/geqxtpXVxGlHm/xzPRaUJXFaNOPMsfTXVhGPctjkAtwsgAAAAAAAAAAAAB8gHyAKE9Iv29z34jX/ezAGf6Rft7nvxGv+9mALht/lR6L0MMAA2mA+TL9aA+wuA/Dbf8ApxKCvky/WgPsLgPw23/pxIjtb8qn1ZkzYAIOZAAAKxeWjoLrQtte46j6UVG2yKiua/06j/AGv+Uq4fS/U2Hs8/gL3DZCmqlteUZUqkWuxrmfOzXmm7zSWrMhgL6MlVtKrjGTW3Xj6svFbFkbJ4l29B2034oadP5+iM4vbdnU7WOj9TBhvZbg668uHVJfqcdLNnVJ9aW5zTnKnUjUhJxnFqUZLg01yZ+QbDcWl6N9Rx1Npa2vpSXymC81crumub8efibKVz6EtS/MmqI2NxU6tnkNqct3wjU9V/28SxhF72h2NVpaPQhuIW3d6zS0fFBmxaBw/zrm4Tqx3trfapU35SfZH4mvRTlJRit23skTJorErEYSnTlFKvV9Oq/a+zwODit33ehktXwR09nMN77dpyXhjxfsjNgAhRa5g9aYpZTDTUI716Pp03+q8SKnwezWzJxIu11ivm7LyqU47ULj04+x9qK922wvNRvYLThL2ft/h8TXM184Bg9cZlYXA1q8ZJV6i83RX8T7fArqnBziorVmirUjTg5y0RHnShmvnLNqyoz3trPeK25Sm/rP8AsaicyblJyk223u2+0Eso0lSgoLkQSvWlXqOpLmZLFVutTdKT4x5e495gKFR0qsai7H8UZ2nKM4qUXumt0aa0cnmeaSyP0ZHTOIus7nbTE2cd61zUUE/urtk/Ylu/AxxPHk4aW+T2dfU93T2qV06VruuUPWl4vh4Hrwuxd7cxp8tX0PXh9q7quocufQljA4y2w2HtcXaR6tG2pqEfbtzb9rfE9oBasYqKUVoiwoxUVkgADJkAAAAAAAAAAAAAAAB8gHyAKE9Iv29z34hX/ezAGf6Rft7nvxGv8AvZgC4bf5Uei9DDAANpgPky/WgPsLgPw23/pxKCvky/WgPsLgPw23/pxIjtb8qn1ZkzYAIOZAAABXHyztCfLMLb64x9DetZbUL/AKq4uk3tGb/6W9n7JewsceXL4+1yuKusZfUY1rW6oyo1aclwlGS2a/M92G3srK5jWjy1+q5mi5oKvScHzPmS3st2eaTblu+02zpW0ndaJ1nkNP3Kk40am9Co1/mUnxjL4fmmakXPQqRqwVSDzT0IbuODalqjkAG4yE2pJptNcU12FnOinUv+JdJ0K9aW97bfQXPe5JcJfzLZ+/crESv5NlxWepL7HU+tKNxbqSivvRktv1OfiVJTouXkczFaCq0N7mizfRzh/nHM/KasN7e12lLdcHL1V/clgxOk8VDD4WjapLzj9Oq++T5/7GWKjxK67zXbWi4ImWBYd3C0jB/E+L6+X2AAPAdkGJ1Zi1lcPUoxS89D06T/AIl2ePIywNFzbwuaUqNRZqSyYIOcXGTjJNNPZp9hDHSRm/nfPTpUZ72trvTp7cpS9aXx4eBNPlBVVpq1qXVs1GpkN400ucZes/gVv7SoqeFzsrmcamsXkv3/AIRfHLnLKhHq/YLkcgHuI6cMyWJrbxdGT5cYmOO2yk43VNrv2PipHeiYkjdNGYO41FqSzxNunvWn6b+7BcZPwRbzF2Vvjcdb2NrBQo0KahBLuRF3k6aV+b8NV1Hd09rm9XUt919Wknz/AJn+SRLRONnLDu1t2sl4p8fty/ZMcEs+wodpLWXpyAAJCdoAAAAAAAAAAAAAAAAAAAAApD06YethulDNUKkGoV67uaT+9GfH9dzSC4HlBdGstaYeGSxMIfPNlF9SL4efhzcN+/uKi3tpc2V1UtbyhUt69OTjOnUi4yi12NMs/Bb+F3bRSfiismvf7mDpACi5SUUm2+CR1wejHWlfIX9vY2sHOvcVI0qcV2yk9l+p9AcHZRxuFscdF7xtbenRT7+rFR/sQB5NfRbdUL2lrHUNq6Kgt8fb1I7Sbf8AqNdnDl8SxZANpr+FxVjSpvNR16v9GQACMAAAAAAAr/5ZWg1mtJU9W2NHe8xXC46q4zoN8/5Xx9zKa9p9RL61t76yrWd3SjWt69OVOrTkt1KLWzT8ChvT10SZXo9z9aua0atzp64m5Wl0lv5tP/Tqd0ly37Vx70rC2RxaLp9zqvivh+q8jg4ratS7WK4PUi4AE5OKCxfkSaVnf6lyepa9N/JbKnGjTbXCVST3/JL80QroHRmf1tnaOIwNlOvVnJecqNNU6Me2U5diR9Aei/RmN0Fo2z07jd5qiutXrSW0q1V/Wm/e+S7EkiKbU4rC3tnbwfjl+Fz/AEdHDrPtp78l4V6mzgAq8k4AAAEmoptvZLmCPunTVL0/pKdna1erfZDejBp8YQ9eXw4L3+w0XVxC2oyqz0SNNxWjQpyqS0RCXTdqP/Fmp7hUZ9aztN6Vts+D25y8WRfs02nzRsPMxuStX1nWprdP6yX6lWzupV60qlR8ZPMrypXlWqOc9WeAHAPswcmzdF+m62qdZ2OLgn5pz69eS9WC4s1mMZSaik232FpPJt0Z8xaYedvaSV9kknBNcYUV9VePP4HQwuz73cKD0XF9D3Yda96rqL0XFkq2dvStLWlbUIKFKlBQhFLgklsjtALFSy4IniWQABkAAAAAAAAAAAAAAAAAAAAAA1bWnR/pTVy62axVKpX22VeHoVF/MjaQbKVWdKW9TeT+gIVq+TlpGVfrwyeVp0/uKcX+extmj+iLRGma8Lq2xiurqD3jWun5xxfek+CN+B66uK3lWO7Oo8gEtlsgAeAAAAAAAAAAA6MhZWmQs6lnfW1K5t6q6s6dWKlGS9qZ3gym080NSGdT+Tb0dZi4ncWlC8xM58WrWr6G/sjLdIxuG8lzQVpXjUvr3K5CKe/UqVVBP/tSJ4B1I43iEYbirPLr76nldlQbz3EYfSumMDpbHKwwGLtrCguapQ2cn3t82ZgA5k5ynJyk82z0pKKyQAB8mQAAD/9k=" alt="ivy tutors network" style="height:48px; width:auto;" />
+    <div>
+      <div class="itn-title">Transition Words: The Partial Agreement Trap</div>
+      <div class="itn-sub">Reasoning Skill Builder — SAT Reading &amp; Writing</div>
     </div>
-  );
-}
+  </div>
 
-function Header() {
-  return (
-    <div style={{ background: "rgba(0,0,0,0.2)", padding: "12px 20px", display: "flex", alignItems: "center", gap: 14, backdropFilter: "blur(8px)" }}>
-      <img src={LOGO_SRC} alt="ivy tutors network" style={{ height: 42, width: "auto" }} />
+  <div class="card">
+    <span class="tag tag-concept">The Core Concept</span>
+    <h2>Why this type of question trips students up</h2>
+    <p>Some transition questions set a trap using a two-part prediction in the first sentence. The second sentence then confirms one part of the prediction while quietly contradicting the other. Students who catch only the confirmed part walk straight into the trap and choose a causation or addition word. The correct answer is almost always a contrast word, because the full picture is not what was expected.</p>
+    <div class="framework-box">
+      <p><strong>Map the Prediction rule:</strong> Before choosing any transition, list every claim sentence 1 makes. Then check sentence 2 against each one. If even one claim is contradicted, the relationship is contrast, not confirmation.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-walkthrough">Worked Example</span>
+    <h2>Let's map the original question</h2>
+    <div class="passage-block">
+      <span class="label label-a">Sentence 1</span> According to climate envelope models, individual organisms that inhabit the coolest areas of their species' geographic distribution are expected to benefit from a warming climate, while individuals in the warmest areas will struggle.<br><br>
+      <span class="label label-b">Sentence 2</span> A 2024 University of Arizona study, <span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> found that warmer-than-average temperatures resulted in a decrease in growth <em>across all areas</em> of the common piñon tree's distribution range.
+    </div>
+
+    <p style="font-size:13px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Prediction map</p>
+    <div class="map-grid">
       <div>
-        <div style={{ color: "white", fontWeight: 700, fontSize: 16, fontFamily: "sans-serif", letterSpacing: 0.3 }}>Transitions Practice</div>
-        <div style={{ color: "#29ABE2", fontSize: 11, fontFamily: "sans-serif" }}>ivy tutors network</div>
+        <div class="map-col-label">Prediction (sentence 1)</div>
+        <div class="map-cell predict">
+          <span class="cell-badge badge-predict">Prediction A</span><br>
+          Cool-area organisms will benefit from warming
+        </div>
+        <div class="map-cell predict">
+          <span class="cell-badge badge-predict">Prediction B</span><br>
+          Warm-area organisms will struggle from warming
+        </div>
+      </div>
+      <div class="map-arrow">&#8594;</div>
+      <div>
+        <div class="map-col-label">What the study actually found</div>
+        <div class="map-cell finding-clash">
+          <span class="cell-badge badge-clash">Contradicted</span><br>
+          All areas showed decreased growth. Cool areas did NOT benefit.
+        </div>
+        <div class="map-cell finding-ok">
+          <span class="cell-badge badge-ok">Confirmed</span><br>
+          Growth also declined in warm areas, consistent with "will struggle."
+        </div>
       </div>
     </div>
-  );
-}
-
-function PhaseIndicator({ phase }) {
-  const steps = [
-    { key: "category", label: "Relationship" },
-    { key: "answer", label: "Answer" },
-    { key: "feedback", label: "Review" },
-  ];
-  const idx = steps.findIndex(s => s.key === phase);
-  return (
-    <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-      {steps.map((s, i) => (
-        <span key={s.key} style={{
-          fontSize: 11, fontWeight: 700, fontFamily: "sans-serif",
-          padding: "4px 10px", borderRadius: 10,
-          background: i === idx ? "#1B3878" : i < idx ? "#29ABE2" : "#e5e7eb",
-          color: i <= idx ? "white" : "#999",
-          transition: "all 0.3s"
-        }}>{s.label}</span>
-      ))}
+    <div class="verdict verdict-contrast">
+      <span style="font-size:20px; flex-shrink:0;">&#10007;</span>
+      <span>One prediction confirmed, one contradicted. The overall relationship is <strong>contrast</strong>. Correct answer: A (though)</span>
     </div>
-  );
-}
+    <p style="margin-top:14px; font-size:14.5px; color:#555;">Students who pick B (therefore) or D (for example) are only seeing Prediction B confirmed. They miss that cool-area organisms were supposed to benefit but did not. "Though" signals that the study's finding cuts against what the full model would lead you to expect.</p>
+  </div>
 
-function ScoreBox({ label, value, total, color }) {
-  const pct = Math.round((value / total) * 100);
-  return (
-    <div style={{ flex: 1, background: color + "08", border: `1.5px solid ${color}25`, borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
-      <div style={{ fontSize: 36, fontWeight: 800, color, fontFamily: "sans-serif" }}>{value}<span style={{ fontSize: 18, color: "#aaa" }}>/{total}</span></div>
-      <div style={{ fontSize: 12, color: "#888", fontFamily: "sans-serif", marginTop: 2 }}>{label} ({pct}%)</div>
+  <div class="card">
+    <span class="tag tag-drill">Drill 1</span>
+    <h2>Apply the Map the Prediction rule</h2>
+    <div class="q-passage">
+      Nutrition researchers have long maintained that reducing saturated fat intake lowers the risk of cardiovascular disease, while a diet consistently high in saturated fat accelerates arterial damage over time. A large-scale review of 27 clinical trials published last year, <span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> found no meaningful difference in cardiovascular outcomes between participants who significantly reduced saturated fat and those who maintained their usual diet.
     </div>
-  );
+    <div class="choices" id="drill1-choices">
+      <button class="choice-btn" onclick="checkAnswer(this,'drill1',false)">
+        <div class="bubble">A</div><span>consequently,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill1',true)">
+        <div class="bubble">B</div><span>though,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill1',false)">
+        <div class="bubble">C</div><span>for example,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill1',false)">
+        <div class="bubble">D</div><span>furthermore,</span>
+      </button>
+    </div>
+    <div class="feedback correct" id="drill1-correct">
+      Correct. Map the two predictions: (1) reducing saturated fat lowers cardiovascular risk, and (2) high saturated fat accelerates damage. The review contradicts prediction 1 by finding no improvement from reducing saturated fat. That contradiction makes this a contrast relationship, so "though" is right. Students who pick A or D are anchoring only on the "high saturated fat is bad" part and ignoring whether the low-fat intervention actually helped.
+    </div>
+    <div class="feedback incorrect" id="drill1-incorrect">
+      Not quite. Map both predictions first. Sentence 1 claims that (1) reducing saturated fat lowers risk and (2) high saturated fat causes damage. The review found no benefit from reducing saturated fat, so prediction 1 was contradicted, even if prediction 2 still holds. When any claim from sentence 1 is overturned, the transition should signal contrast. The answer is B (though).
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-drill">Drill 2</span>
+    <h2>One more rep</h2>
+    <div class="q-passage">
+      Marine biologists predicted that rising ocean temperatures would reduce fish populations in tropical waters while simultaneously allowing species to expand their ranges into previously too-cold polar regions. A decade-long survey of Pacific fish populations, <span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> documented a decline in species diversity across both tropical and polar zones alike.
+    </div>
+    <div class="choices" id="drill2-choices">
+      <button class="choice-btn" onclick="checkAnswer(this,'drill2',false)">
+        <div class="bubble">A</div><span>therefore,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill2',false)">
+        <div class="bubble">B</div><span>for instance,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill2',true)">
+        <div class="bubble">C</div><span>however,</span>
+      </button>
+      <button class="choice-btn" onclick="checkAnswer(this,'drill2',false)">
+        <div class="bubble">D</div><span>additionally,</span>
+      </button>
+    </div>
+    <div class="feedback correct" id="drill2-correct">
+      Correct. Map both predictions: (1) tropical populations would decline, and (2) polar populations would expand. The survey confirmed the tropical decline but contradicted the polar expansion, since polar zones declined too. That makes this a contrast relationship. This is the same trap as the piñon tree question: one prediction confirmed, one contradicted, so the transition must be a contrast word. The answer is C (however).
+    </div>
+    <div class="feedback incorrect" id="drill2-incorrect">
+      Not quite. Map out both predictions. The biologists said (1) tropical fish populations would fall and (2) polar populations would expand. The survey found declines in both zones. Prediction 1 was confirmed, but prediction 2 was directly contradicted. Because at least one claim is overturned, the relationship is contrast. The answer is C (however).
+    </div>
+  </div>
+
+</div>
+
+<script>
+function checkAnswer(btn, drillId, isCorrect) {
+  var correctLetter = drillId === 'drill1' ? 'B' : 'C';
+  var allBtns = document.querySelectorAll('#' + drillId + '-choices .choice-btn');
+  allBtns.forEach(function(b) { b.disabled = true; });
+  if (isCorrect) {
+    btn.classList.add('correct');
+    document.getElementById(drillId + '-correct').style.display = 'block';
+  } else {
+    btn.classList.add('incorrect');
+    document.getElementById(drillId + '-incorrect').style.display = 'block';
+    allBtns.forEach(function(b) {
+      if (b.querySelector('.bubble').textContent.trim() === correctLetter) {
+        b.classList.add('reveal-correct');
+      }
+    });
+  }
 }
+</script>
+</body>
+</html>
